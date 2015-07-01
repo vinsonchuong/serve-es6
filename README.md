@@ -1,6 +1,10 @@
 # serve-es6
 [![Build Status](https://travis-ci.org/vinsonchuong/serve-es6.svg?branch=master)](https://travis-ci.org/vinsonchuong/serve-es6)
-[![Code Climate](https://codeclimate.com/github/vinsonchuong/serve-es6.png)](https://codeclimate.com/github/vinsonchuong/serve-es6)
+
+An executable that seamlessly runs Node.js servers and web apps written in ES6+.
+
+Note that this is still a work in progress and as such, is currently not yet
+documented.
 
 ## Installing
 `serve-es6` is available as an
