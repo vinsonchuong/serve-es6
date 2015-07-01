@@ -1,8 +1,96 @@
+import fs from 'node-promise-es6/fs';
+import path from 'path';
 import {exec} from 'node-promise-es6/child-process';
+import {spawn} from 'child_process';
+import fetch from 'node-fetch';
+
+function promiseEvent(eventEmitter, event) {
+  return new Promise(resolve =>
+    eventEmitter.once(event, result =>
+      resolve(result)
+    )
+  );
+}
 
 describe('serve-es6', function() {
-  it('outputs "3...2...1...Hello World!"', async function() {
-    const {stdout} = await exec('serve-es6');
-    expect(stdout.trim()).toBe('3...2...1...Hello World!');
+  afterEach(async function() {
+    try {
+      const {stdout: serverPid} = await exec(`pgrep -f 'node.*serve-es6$'`);
+      await exec(`kill ${serverPid}`);
+    } catch (e) {
+      if (e.message.indexOf(`pgrep -f 'node.*serve-es6$'`) === -1) {
+        throw e;
+      }
+    }
+    await fs.remove(path.resolve('project'));
+  });
+
+  it('runs the main file of a project', async function() {
+    await fs.mkdirs(path.resolve('project/src'));
+    await fs.writeJson(path.resolve('project/package.json'), {
+      name: 'project',
+      main: 'src/index.js',
+      scripts: {
+        start: 'serve-es6'
+      }
+    });
+    await fs.writeFile(path.resolve('project/src/index.js'), `
+      async function sleep(ms) {
+        await new Promise(resolve => setTimeout(() => resolve(), ms));
+      }
+
+      async function run() {
+        process.stdout.write('1...');
+        await sleep(100);
+        process.stdout.write('2...');
+        await sleep(100);
+        process.stdout.write('3...');
+        await sleep(100);
+        process.stdout.write('done\\n');
+      }
+
+      run();
+    `);
+
+    const child = spawn('npm', ['start'], {cwd: path.resolve('project')});
+
+    let output = '';
+    child.stdout.on('data', text => output += text);
+    child.stderr.on('data', text => output += text);
+
+    await promiseEvent(child, 'exit');
+
+    expect(output).toContain('1...2...3...done\n');
+  });
+
+  it('runs a web server', async function() {
+    await fs.mkdirs(path.resolve('project/src'));
+    await fs.writeJson(path.resolve('project/package.json'), {
+      name: 'project',
+      main: 'src/index.js',
+      scripts: {
+        start: 'serve-es6'
+      }
+    });
+    await fs.writeFile(path.resolve('project/src/index.js'), `
+      var http = require('http');
+      var server = http.createServer((request, response) => {
+        response.end(request.url, 'utf8');
+      });
+      server.listen(3000, () => process.stdout.write('Listening\\n'));
+    `);
+
+    const child = spawn('npm', ['start'], {cwd: path.resolve('project')});
+
+    await new Promise(resolve =>
+      child.stdout.on('data', data => {
+        if (data.toString().indexOf('Listening') > -1) {
+          resolve();
+        }
+      })
+    );
+
+    const response = await fetch('http://localhost:3000/ping');
+    expect(await response.text()).toBe('/ping');
   });
 });

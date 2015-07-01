@@ -1,21 +1,13 @@
-async function count(n) {
-  return new Promise((resolve) => {
-    function loop(m) {
-      if (m > 0) {
-        process.stdout.write(`${m}...`);
-        setTimeout(() => loop(m - 1), 1000);
-      } else {
-        resolve();
-      }
-    }
-    loop(n);
-  });
+#!/usr/bin/env node
+var path = require('path');
+var fs = require('fs');
 
-}
+require('babel/register')({stage: 0});
 
-async function run() {
-  await count(3);
-  process.stdout.write('Hello World!\n');
-}
-
-run();
+fs.readFile(path.resolve('package.json'), 'utf8', function(error, contents) {
+  if (error) {
+    throw error;
+  }
+  var packageJson = JSON.parse(contents);
+  require(path.resolve(packageJson.main));
+});
