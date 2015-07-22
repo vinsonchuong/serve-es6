@@ -1,6 +1,6 @@
 {
   "name": "serve-es6",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "An executable that seamlessly runs Node.js servers and web apps written in ES6+.",
   "keywords": [],
   "homepage": "https://github.com/vinsonchuong/serve-es6",
@@ -27,10 +27,10 @@
     "babel": "^5.8.3"
   },
   "devDependencies": {
-    "dist-es6": "^0.0.14",
-    "jasmine-es6": "^0.0.14",
-    "eslint-defaults": "^0.0.9",
-    "node-promise-es6": "^0.0.4",
-    "node-fetch": "^1.3.0"
+    "dist-es6": "^0.0.16",
+    "jasmine-es6": "^0.0.16",
+    "eslint-defaults": "^0.0.10",
+    "node-promise-es6": "^0.0.5",
+    "node-fetch": "^1.3.1"
   }
 }
