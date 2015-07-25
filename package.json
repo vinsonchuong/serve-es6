@@ -24,7 +24,7 @@
     "test": "eslint && jasmine"
   },
   "dependencies": {
-    "babel": "^5.8.3"
+    "babel": "^5.8.5"
   },
   "devDependencies": {
     "dist-es6": "^0.0.16",
