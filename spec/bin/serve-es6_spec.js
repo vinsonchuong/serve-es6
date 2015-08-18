@@ -12,20 +12,20 @@ function promiseEvent(eventEmitter, event) {
   );
 }
 
-describe('serve-es6', function() {
-  afterEach(async function() {
+describe('serve-es6', () => {
+  afterEach(async () => {
     try {
       const {stdout: serverPid} = await exec(`pgrep -f 'node.*serve-es6$'`);
       await exec(`kill ${serverPid}`);
-    } catch (e) {
-      if (e.message.indexOf(`pgrep -f 'node.*serve-es6$'`) === -1) {
-        throw e;
+    } catch (error) {
+      if (error.message.indexOf(`pgrep -f 'node.*serve-es6$'`) === -1) {
+        throw error;
       }
     }
     await fs.remove(path.resolve('project'));
   });
 
-  it('runs the main file of a project', async function() {
+  it('runs the main file of a project', async () => {
     await fs.mkdirs(path.resolve('project/src'));
     await fs.writeJson(path.resolve('project/package.json'), {
       name: 'project',
@@ -63,7 +63,7 @@ describe('serve-es6', function() {
     expect(output).toContain('1...2...3...done\n');
   });
 
-  it('runs a web server', async function() {
+  it('runs a web server', async () => {
     await fs.mkdirs(path.resolve('project/src'));
     await fs.writeJson(path.resolve('project/package.json'), {
       name: 'project',

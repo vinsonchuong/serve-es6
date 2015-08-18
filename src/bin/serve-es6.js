@@ -1,13 +1,12 @@
-#!/usr/bin/env node
-var path = require('path');
-var fs = require('fs');
+import path from 'path';
+import fs from 'fs';
 
 require('babel/register')({stage: 0});
 
-fs.readFile(path.resolve('package.json'), 'utf8', function(error, contents) {
+fs.readFile(path.resolve('package.json'), 'utf8', (error, contents) => {
   if (error) {
     throw error;
   }
-  var packageJson = JSON.parse(contents);
+  const packageJson = JSON.parse(contents);
   require(path.resolve(packageJson.main));
 });
