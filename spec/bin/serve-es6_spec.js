@@ -1,7 +1,6 @@
-import fs from 'node-promise-es6/fs';
 import path from 'path';
-import {exec} from 'node-promise-es6/child-process';
-import {spawn} from 'child_process';
+import {fs, childProcess} from 'node-promise-es6';
+import * as fse from 'fs-extra-promise-es6';
 import fetch from 'node-fetch';
 
 function promiseEvent(eventEmitter, event) {
@@ -15,19 +14,19 @@ function promiseEvent(eventEmitter, event) {
 describe('serve-es6', () => {
   afterEach(async () => {
     try {
-      const {stdout: serverPid} = await exec(`pgrep -f 'node.*serve-es6$'`);
-      await exec(`kill ${serverPid}`);
+      const {stdout: serverPid} = await childProcess.exec(`pgrep -f 'node.*serve-es6$'`);
+      await childProcess.exec(`kill ${serverPid}`);
     } catch (error) {
       if (error.message.indexOf(`pgrep -f 'node.*serve-es6$'`) === -1) {
         throw error;
       }
     }
-    await fs.remove(path.resolve('project'));
+    await fse.remove(path.resolve('project'));
   });
 
   it('runs the main file of a project', async () => {
-    await fs.mkdirs(path.resolve('project/src'));
-    await fs.writeJson(path.resolve('project/package.json'), {
+    await fse.mkdirs(path.resolve('project/src'));
+    await fse.writeJson(path.resolve('project/package.json'), {
       name: 'project',
       main: 'src/index.js',
       scripts: {
@@ -52,7 +51,9 @@ describe('serve-es6', () => {
       run();
     `);
 
-    const child = spawn('npm', ['start'], {cwd: path.resolve('project')});
+    const child = childProcess.spawn('npm', ['start'], {
+      cwd: path.resolve('project')
+    });
 
     let output = '';
     child.stdout.on('data', text => output += text);
@@ -64,8 +65,8 @@ describe('serve-es6', () => {
   });
 
   it('runs a web server', async () => {
-    await fs.mkdirs(path.resolve('project/src'));
-    await fs.writeJson(path.resolve('project/package.json'), {
+    await fse.mkdirs(path.resolve('project/src'));
+    await fse.writeJson(path.resolve('project/package.json'), {
       name: 'project',
       main: 'src/index.js',
       scripts: {
@@ -80,7 +81,9 @@ describe('serve-es6', () => {
       server.listen(3000, () => process.stdout.write('Listening\\n'));
     `);
 
-    const child = spawn('npm', ['start'], {cwd: path.resolve('project')});
+    const child = childProcess.spawn('npm', ['start'], {
+      cwd: path.resolve('project')
+    });
 
     await new Promise(resolve =>
       child.stdout.on('data', data => {
