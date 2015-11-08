@@ -1,8 +1,8 @@
 {
   "name": "serve-es6",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "An executable that seamlessly runs Node.js servers and web apps written in ES6+.",
-  "keywords": [],
+  "keywords": ["es6"],
   "homepage": "https://github.com/vinsonchuong/serve-es6",
   "bugs": "https://github.com/vinsonchuong/serve-es6/issues",
   "license": "MIT",
