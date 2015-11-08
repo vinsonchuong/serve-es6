@@ -64,6 +64,45 @@ describe('serve-es6', () => {
     expect(output).toContain('1...2...3...done\n');
   });
 
+  it('runs the server.js if a main file is not specified', async () => {
+    await fse.mkdirs(path.resolve('project/src'));
+    await fse.writeJson(path.resolve('project/package.json'), {
+      name: 'project',
+      scripts: {
+        start: 'serve-es6'
+      }
+    });
+    await fs.writeFile(path.resolve('project/server.js'), `
+      async function sleep(ms) {
+        await new Promise(resolve => setTimeout(() => resolve(), ms));
+      }
+
+      async function run() {
+        process.stdout.write('1...');
+        await sleep(100);
+        process.stdout.write('2...');
+        await sleep(100);
+        process.stdout.write('3...');
+        await sleep(100);
+        process.stdout.write('done\\n');
+      }
+
+      run();
+    `);
+
+    const child = childProcess.spawn('npm', ['start'], {
+      cwd: path.resolve('project')
+    });
+
+    let output = '';
+    child.stdout.on('data', text => output += text);
+    child.stderr.on('data', text => output += text);
+
+    await promiseEvent(child, 'exit');
+
+    expect(output).toContain('1...2...3...done\n');
+  });
+
   it('runs a web server', async () => {
     await fse.mkdirs(path.resolve('project/src'));
     await fse.writeJson(path.resolve('project/package.json'), {

@@ -8,5 +8,5 @@ fs.readFile(path.resolve('package.json'), 'utf8', (error, contents) => {
     throw error;
   }
   const packageJson = JSON.parse(contents);
-  require(path.resolve(packageJson.main));
+  require(path.resolve(packageJson.main || 'server.js'));
 });
