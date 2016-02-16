@@ -11,5 +11,8 @@ fs.readFile(path.resolve('package.json'), 'utf8', (error, contents) => {
     throw error;
   }
   const packageJson = JSON.parse(contents);
+
+  /* eslint-disable lines-around-comment, global-require */
   require(path.resolve(packageJson.main || 'server.js'));
+  /* eslint-enable lines-around-comment, global-require */
 });

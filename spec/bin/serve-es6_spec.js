@@ -4,8 +4,8 @@ import * as fse from 'fs-extra-promise-es6';
 import fetch from 'node-fetch';
 
 function promiseEvent(eventEmitter, event) {
-  return new Promise(resolve =>
-    eventEmitter.once(event, result =>
+  return new Promise((resolve) =>
+    eventEmitter.once(event, (result) =>
       resolve(result)
     )
   );
@@ -14,10 +14,10 @@ function promiseEvent(eventEmitter, event) {
 describe('serve-es6', () => {
   afterEach(async () => {
     try {
-      const {stdout: serverPid} = await childProcess.exec(`pgrep -f 'node.*serve-es6$'`);
+      const {stdout: serverPid} = await childProcess.exec("pgrep -f 'node.*serve-es6$'");
       await childProcess.exec(`kill ${serverPid}`);
     } catch (error) {
-      if (error.message.indexOf(`pgrep -f 'node.*serve-es6$'`) === -1) {
+      if (error.message.indexOf("pgrep -f 'node.*serve-es6$'") === -1) {
         throw error;
       }
     }
@@ -56,8 +56,12 @@ describe('serve-es6', () => {
     });
 
     let output = '';
-    child.stdout.on('data', text => output += text);
-    child.stderr.on('data', text => output += text);
+    child.stdout.on('data', (text) => {
+      output += text;
+    });
+    child.stderr.on('data', (text) => {
+      output += text;
+    });
 
     await promiseEvent(child, 'exit');
 
@@ -95,8 +99,12 @@ describe('serve-es6', () => {
     });
 
     let output = '';
-    child.stdout.on('data', text => output += text);
-    child.stderr.on('data', text => output += text);
+    child.stdout.on('data', (text) => {
+      output += text;
+    });
+    child.stderr.on('data', (text) => {
+      output += text;
+    });
 
     await promiseEvent(child, 'exit');
 
@@ -124,8 +132,8 @@ describe('serve-es6', () => {
       cwd: path.resolve('project')
     });
 
-    await new Promise(resolve =>
-      child.stdout.on('data', data => {
+    await new Promise((resolve) =>
+      child.stdout.on('data', (data) => {
         if (data.toString().indexOf('Listening') > -1) {
           resolve();
         }
