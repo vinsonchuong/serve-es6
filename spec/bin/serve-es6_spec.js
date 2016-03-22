@@ -1,48 +1,8 @@
-import path from 'path';
-import {fs, childProcess} from 'node-promise-es6';
-import * as fse from 'fs-extra-promise-es6';
+import {childProcess} from 'node-promise-es6';
 import fetch from 'node-fetch';
+import Directory from 'directory-helpers';
 
-class Project {
-  path(...args) {
-    return path.resolve('project', ...args);
-  }
-
-  async write(files) {
-    for (const file of Object.keys(files)) {
-      const filePath = this.path(file);
-      const fileContent = files[file];
-      await fse.ensureFile(filePath);
-
-      if (typeof fileContent === 'object') {
-        await fse.writeJson(filePath, fileContent);
-      } else {
-        await fs.writeFile(filePath, fileContent);
-      }
-    }
-  }
-
-  async remove() {
-    await fse.remove(this.path());
-  }
-
-  serve(readyText) {
-    const child = childProcess.spawn('npm', ['start'], {cwd: this.path()});
-    return new Promise((resolve) => {
-      let output = '';
-      child.stdout.on('data', (data) => {
-        output += data;
-
-        if (readyText && output.indexOf(readyText) > -1) {
-          resolve(output);
-        }
-      });
-      child.once('exit', (result) => {
-        resolve(output);
-      });
-    });
-  }
-
+class Project extends Directory {
   async stop() {
     try {
       const {stdout: serverPid} = await childProcess.exec("pgrep -f 'node.*serve-es6$'");
@@ -57,13 +17,13 @@ class Project {
 
 describe('serve-es6', () => {
   afterEach(async () => {
-    const project = new Project();
+    const project = new Project('project');
     await project.stop();
     await project.remove();
   });
 
   it('runs the main file of a project', async () => {
-    const project = new Project();
+    const project = new Project('project');
     await project.write({
       'package.json': {
         name: 'project',
@@ -90,11 +50,12 @@ describe('serve-es6', () => {
         run();
       `
     });
-    expect(await project.serve()).toContain('1...2...3...done\n');
+    expect(await project.exec('npm', ['start']))
+      .toContain('1...2...3...done');
   });
 
   it('runs the server.js if a main file is not specified', async () => {
-    const project = new Project();
+    const project = new Project('project');
     await project.write({
       'package.json': {
         name: 'project',
@@ -120,11 +81,12 @@ describe('serve-es6', () => {
         run();
       `
     });
-    expect(await project.serve()).toContain('1...2...3...done\n');
+    expect(await project.exec('npm', ['start']))
+      .toContain('1...2...3...done');
   });
 
   it('runs a web server', async () => {
-    const project = new Project();
+    const project = new Project('project');
     await project.write({
       'package.json': {
         name: 'project',
@@ -141,7 +103,9 @@ describe('serve-es6', () => {
         server.listen(3000, () => process.stdout.write('Listening\\n'));
       `
     });
-    await project.serve('Listening');
+    await project
+      .spawn('npm', ['start'])
+      .filter((output) => output.match(/Listening/));
 
     const response = await fetch('http://localhost:3000/ping');
     expect(await response.text()).toBe('/ping');
