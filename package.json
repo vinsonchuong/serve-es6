@@ -26,13 +26,13 @@
     "test": "eslint && jasmine"
   },
   "dependencies": {
-    "dist-es6": "^0.1.13"
+    "dist-es6": "^0.1.18"
   },
   "devDependencies": {
-    "jasmine-es6": "^0.1.7",
-    "eslint-defaults": "^0.2.4",
+    "jasmine-es6": "^0.1.10",
+    "eslint-defaults": "^0.2.5",
     "node-promise-es6": "^0.3.2",
-    "node-fetch": "^1.4.0",
-    "directory-helpers": "^0.0.5"
+    "node-fetch": "^1.5.2",
+    "directory-helpers": "^0.0.7"
   }
 }
